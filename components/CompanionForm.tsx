@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { subjects } from "@/constants"
 import { Textarea } from "./ui/textarea"
+import { createCompanion } from "@/lib/actions/companion.action"
+import { redirect } from "next/navigation"
 
 const formSchema = z.object({
   name: z.string().min(1,{message: "Name is required"}),
@@ -42,10 +44,22 @@ const form = useForm({
     },
   })
  
-  // 2. Define a submit handler.
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-  console.log(values);  // values.duration is now number
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const companion = await createCompanion(values);
+  
+  // DEBUG: See exactly what we get
+  console.log("Companion data:", companion);
+  
+  if(companion?.id){
+    redirect(`/companions/${companion.id}`);  // This is CORRECT
+  }
+  else{
+    console.log("Failed - no ID:", companion);
+    redirect('/');
+  }
 };
+
+
 
 
 
